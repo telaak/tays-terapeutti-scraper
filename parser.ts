@@ -134,8 +134,8 @@ export class TaysParser {
       const Vastaanotot = Array.from(rowArray[0].children)
         .filter((n) => n.textContent)
         .map((n) => n.textContent?.trim()) as string[];
-      const Ajanvaraus = this.findRow(rowArray, "Puhelin");
-      const Puhelin = this.splitAndTrim(this.findRow(rowArray, "Kotisivut"));
+      const Ajanvaraus = this.findRow(rowArray, "Ajanvaraus");
+      const Puhelin = this.splitAndTrim(this.findRow(rowArray, "Puhelin"));
       const Sähköposti = this.splitAndTrim(
         this.findRow(rowArray, "Sähköposti")
       );
