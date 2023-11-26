@@ -63,7 +63,9 @@ export class TaysParser {
     for (const row of sliced) {
       const children = row.children;
       const cells = row.querySelectorAll("td");
-      const href = row.querySelector("a")!.getAttribute("href") as string;
+      const link = row.querySelector("a") as HTMLAnchorElement;
+      const href = link.getAttribute("href") as string;
+      const [Sukunimi, Etunimi] = this.splitAndTrim(link.textContent as string);
       const Pätevyys = this.mapTherapyTypes(
         cells[0].childNodes[cells[0].childNodes.length - 1]
           .textContent as string
@@ -84,6 +86,10 @@ export class TaysParser {
           Pätevyys,
           ...moreData,
         };
+        if (!(newTherapist.Etunimi && newTherapist.Sukunimi)) {
+          newTherapist.Etunimi = Etunimi;
+          newTherapist.Sukunimi = Sukunimi;
+        }
         console.log(newTherapist);
         therapists.push(newTherapist);
       }
