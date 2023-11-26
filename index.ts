@@ -1,7 +1,8 @@
 import axios from "axios";
 import { TaysParser } from "./parser";
+import { CronJob } from "cron";
 
-async function test() {
+async function parse() {
   const parser = new TaysParser();
   const therapists = await parser.parseAllTherapists();
   if (process.env.API_URL) {
@@ -13,16 +14,22 @@ async function test() {
   }
 }
 
-async function seppo() {
-  const parser = new TaysParser();
-  const html = (
-    await axios.get(
-      "https://www.tays.fi/fi-FI/Sairaanhoitopiiri/Alueellinen_yhteistyo/Mielenterveystyo/Terapeuttirekisteri/Pariperheterapia"
-    )
-  ).data;
-  parser.parseTherapistTable(html);
+if (process.env.PARSE_ON_BOOT === "true") {
+  try {
+    parse();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-// seppo();
-
-test();
+if (process.env.CRON) {
+  console.log(`cronjob scheduled for ${process.env.CRON}`);
+  const job = CronJob.from({
+    cronTime: process.env.CRON,
+    onTick: function () {
+      parse();
+    },
+    start: true,
+    timeZone: "Europe/Helsinki",
+  });
+}
