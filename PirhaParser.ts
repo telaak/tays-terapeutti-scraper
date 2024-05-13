@@ -1,7 +1,7 @@
 import axios from "axios";
 import jsdom from "jsdom";
 import { writeFile, mkdir } from "fs/promises";
-import { ContactInfo, TherapyInfo } from "./newTypes";
+import { ContactInfo, Therapist, TherapyInfo } from "./newTypes";
 const { JSDOM } = jsdom;
 
 const links = [
@@ -30,12 +30,12 @@ class PirhaParser {
   parseTherapist(html: string) {
     const therapist = new JSDOM(html).window.document;
 
-    let therapistJson: any = {};
+    let therapistJson: Partial<Therapist> = {};
 
     const ingress = therapist.querySelector(".ingress") as HTMLParagraphElement;
 
     if (ingress) {
-      therapistJson.jobTitle = ingress.textContent;
+      therapistJson.jobTitle = ingress.textContent as string;
     }
 
     const paragraphs = Array.from(therapist.querySelectorAll("p"));
@@ -60,7 +60,7 @@ class PirhaParser {
       ) as HTMLUListElement;
 
       const contactInfo = this.parseContactInfoNode(contactInfoList);
-      therapistJson.contactInfo = contactInfo;
+      therapistJson = { ...therapistJson, ...contactInfo };
     } catch (error) {
       console.error(error);
     }
@@ -76,12 +76,12 @@ class PirhaParser {
         ) as HTMLParagraphElement;
         const education = Array.from(educationParagraph.childNodes)
           .filter((n) => n.nodeName === "#text")
-          .map((n) => n.textContent?.trim());
+          .map((n) => n.textContent?.trim()) as string[];
         therapistJson.education = education;
       } else {
         const education = Array.from(educationList.querySelectorAll("li")).map(
           (n) => n.textContent?.trim()
-        );
+        ) as string[];
         therapistJson.education = education;
       }
     } catch (error) {
@@ -93,7 +93,7 @@ class PirhaParser {
         n.previousElementSibling?.textContent?.includes("Terapiatiedot")
       ) as HTMLUListElement;
       const therapyInfo = this.parseTherapyInfoNode(therapyInfoList);
-      therapistJson.therapyInfo = therapyInfo;
+      therapistJson = { ...therapistJson, ...therapyInfo };
     } catch (error) {
       console.error(error);
     }
@@ -222,10 +222,11 @@ class PirhaParser {
     const therapistLink = therapistCell.querySelector("a") as HTMLAnchorElement;
     const href = therapistLink.getAttribute("href") as string;
 
-    const fullName = therapistLink.textContent as string;
-    const nameArray = fullName.split(/\s|&nbsp;/g);
+    const parsedFullName = therapistLink.textContent as string;
+    const nameArray = parsedFullName.split(/\s|&nbsp;/g);
     const lastName = nameArray[0];
     const firstName = nameArray[1];
+    const fullName = `${firstName}${lastName}`;
 
     const extraInfoNode = Array.from(therapistCell.childNodes).find(
       (n) => n.nodeName === "#text"
@@ -243,6 +244,7 @@ class PirhaParser {
     return {
       firstName,
       lastName,
+      fullName,
       href,
       extraInfoTypes,
       spaceAvailable,
@@ -255,7 +257,7 @@ class PirhaParser {
     const tableRows = table.querySelectorAll("tr");
     const therapistRows = Array.from(tableRows).slice(1);
     const therapists = therapistRows.map((t) => this.parseTherapistRow(t));
-    const fullTherapists: any[] = [];
+    const fullTherapists: Partial<Therapist>[] = [];
 
     for (let therapist of therapists) {
       const therapistHtml: string = (
@@ -267,6 +269,10 @@ class PirhaParser {
       const type = link.split("/").pop();
       try {
         await mkdir(`./therapists/${type}`, { recursive: true });
+        axios.post(
+          "http://localhost:3000/api/therapist?postSecret=testSecret",
+          fullTherapist
+        );
       } catch (error) {}
       writeFile(
         `./therapists/${type}/${therapist.lastName}-${therapist.firstName}.json`,
