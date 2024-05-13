@@ -98,6 +98,20 @@ export class PirhaParser {
       console.error(error);
     }
 
+    try {
+      const homepageParagraph = paragraphs.find((p) =>
+        p.textContent?.includes("Kotisivut")
+      );
+      if (homepageParagraph) {
+        const homePageLink = homepageParagraph.querySelector("a");
+        if (homePageLink) {
+          therapistJson.homePage = homePageLink.href;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
     return therapistJson;
   }
 
@@ -281,7 +295,7 @@ export class PirhaParser {
 
       if (process.env.API_URL) {
         try {
-          axios.post(process.env.API_URL, therapist);
+          axios.post(process.env.API_URL, fullTherapist);
         } catch (error) {
           console.error(error);
         }

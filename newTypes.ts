@@ -20,5 +20,6 @@ export type Therapist = {
   reception?: string[];
   education?: string[];
   spaceAvailable?: string;
+  homePage?: string;
 } & TherapyInfo &
   ContactInfo;
