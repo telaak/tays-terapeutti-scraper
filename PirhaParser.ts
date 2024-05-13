@@ -182,7 +182,9 @@ class PirhaParser {
         .splice(emailNodeIndex, 1)
         .pop() as HTMLLIElement;
       if (emailNode) {
-        const email = emailNode?.textContent?.replace(/\D/g, "");
+        const email = emailNode?.textContent
+          ?.replace(/Sähköposti/, "")
+          .replace(/\s/g, "");
         contactInfo.email = email;
       }
     } catch (error) {
