@@ -1,17 +1,11 @@
 import axios from "axios";
-import { TaysParser } from "./parser";
 import { CronJob } from "cron";
+import { PirhaParser } from "./PirhaParser";
+import 'dotenv/config'
 
 async function parse() {
-  const parser = new TaysParser();
+  const parser = new PirhaParser();
   const therapists = await parser.parseAllTherapists();
-  if (process.env.API_URL) {
-    try {
-      axios.post(process.env.API_URL, therapists);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 }
 
 if (process.env.PARSE_ON_BOOT === "true") {

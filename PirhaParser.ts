@@ -15,8 +15,8 @@ const links = [
   "https://www.pirha.fi/web/psykoterapeuttirekisteri/yksiloterapia/muut-yksiloterapiat",
 ];
 
-class PirhaParser {
-  public therapists: any[] = [];
+export class PirhaParser {
+  public therapists: Partial<Therapist>[] = [];
 
   async parseAllTherapists() {
     for (const link of links) {
@@ -126,8 +126,10 @@ class PirhaParser {
     }
 
     try {
-      const targetGroupNodeIndex = listElements.findIndex((n) =>
-        n.textContent?.includes("Kohderyhmä:")
+      const targetGroupNodeIndex = listElements.findIndex(
+        (n) =>
+          n.textContent?.includes("Kohderyhmä:") ||
+          n.textContent?.includes("Kohderyhmät:")
       );
 
       if (targetGroupNodeIndex >= 0) {
@@ -136,7 +138,8 @@ class PirhaParser {
           .pop() as HTMLLIElement;
 
         const targetGroups = targetGroupNode.textContent
-          ?.replace("Kohderyhmä:", "")
+          ?.replace("Kohderyhmät:", "")
+          .replace("Kohderyhmä:", "")
           .split(",")
           .map((t) => t.trim()) as string[];
 
@@ -275,22 +278,16 @@ class PirhaParser {
       const fullTherapist = { ...therapist, ...therapistInfo };
       fullTherapists.push(fullTherapist);
       const type = link.split("/").pop();
-      try {
-        await mkdir(`./therapists/${type}`, { recursive: true });
-        axios.post(
-          "http://localhost:3000/api/therapist?postSecret=testSecret",
-          fullTherapist
-        );
-      } catch (error) {}
-      writeFile(
-        `./therapists/${type}/${therapist.lastName}-${therapist.firstName}.json`,
-        JSON.stringify(fullTherapist, null, 2)
-      );
+
+      if (process.env.API_URL) {
+        try {
+          axios.post(process.env.API_URL, therapist);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     }
 
     return fullTherapists;
   }
 }
-
-const parser = new PirhaParser();
-parser.parseAllTherapists();
