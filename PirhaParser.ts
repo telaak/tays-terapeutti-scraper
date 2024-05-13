@@ -108,36 +108,40 @@ class PirhaParser {
 
     try {
       const languagesNodeIndex = listElements.findIndex((n) =>
-        n.textContent?.includes("Psykoterapiakielet: ")
+        n.textContent?.includes("Psykoterapiakielet:")
       );
-      const languageNode = listElements
-        .splice(languagesNodeIndex, 1)
-        .pop() as HTMLLIElement;
+      if (languagesNodeIndex >= 0) {
+        const languageNode = listElements
+          .splice(languagesNodeIndex, 1)
+          .pop() as HTMLLIElement;
 
-      const languages = languageNode.textContent
-        ?.replace("Psykoterapiakielet: ", "")
-        .split(",")
-        .map((t) => t.trim()) as string[];
-      therapyInfo.languages = languages;
+        const languages = languageNode.textContent
+          ?.replace("Psykoterapiakielet: ", "")
+          .split(",")
+          .map((t) => t.trim()) as string[];
+        therapyInfo.languages = languages;
+      }
     } catch (error) {
       console.error(error);
     }
 
     try {
       const targetGroupNodeIndex = listElements.findIndex((n) =>
-        n.textContent?.includes("Kohderyhmä: ")
+        n.textContent?.includes("Kohderyhmä:")
       );
 
-      const targetGroupNode = listElements
-        .splice(targetGroupNodeIndex, 1)
-        .pop() as HTMLLIElement;
+      if (targetGroupNodeIndex >= 0) {
+        const targetGroupNode = listElements
+          .splice(targetGroupNodeIndex, 1)
+          .pop() as HTMLLIElement;
 
-      const targetGroups = targetGroupNode.textContent
-        ?.replace("Kohderyhmä: ", "")
-        .split(",")
-        .map((t) => t.trim()) as string[];
+        const targetGroups = targetGroupNode.textContent
+          ?.replace("Kohderyhmä:", "")
+          .split(",")
+          .map((t) => t.trim()) as string[];
 
-      therapyInfo.targetGroups = targetGroups;
+        therapyInfo.targetGroups = targetGroups;
+      }
     } catch (error) {
       console.error(error);
     }
@@ -163,12 +167,14 @@ class PirhaParser {
       const phoneNumberNodeIndex = listElements.findIndex((n) =>
         n.textContent?.includes("Puhelin")
       );
-      const phoneNumberNode = listElements
-        .splice(phoneNumberNodeIndex, 1)
-        .pop() as HTMLLIElement;
-      if (phoneNumberNode) {
-        const phoneNumber = phoneNumberNode?.textContent?.replace(/\D/g, "");
-        contactInfo.phoneNumber = phoneNumber;
+      if (phoneNumberNodeIndex >= 0) {
+        const phoneNumberNode = listElements
+          .splice(phoneNumberNodeIndex, 1)
+          .pop() as HTMLLIElement;
+        if (phoneNumberNode) {
+          const phoneNumber = phoneNumberNode?.textContent?.replace(/\D/g, "");
+          contactInfo.phoneNumber = phoneNumber;
+        }
       }
     } catch (error) {
       console.error(error);
@@ -178,14 +184,16 @@ class PirhaParser {
       const emailNodeIndex = listElements.findIndex((n) =>
         n.textContent?.includes("Sähköposti")
       );
-      const emailNode = listElements
-        .splice(emailNodeIndex, 1)
-        .pop() as HTMLLIElement;
-      if (emailNode) {
-        const email = emailNode?.textContent
-          ?.replace(/Sähköposti/, "")
-          .replace(/\s/g, "");
-        contactInfo.email = email;
+      if (emailNodeIndex >= 0) {
+        const emailNode = listElements
+          .splice(emailNodeIndex, 1)
+          .pop() as HTMLLIElement;
+        if (emailNode) {
+          const email = emailNode?.textContent
+            ?.replace(/Sähköposti/, "")
+            .replace(/\s/g, "");
+          contactInfo.email = email;
+        }
       }
     } catch (error) {
       console.error(error);
