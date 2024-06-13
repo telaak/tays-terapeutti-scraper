@@ -1,22 +1,21 @@
-import axios from "axios";
-import { TaysParser } from "./parser";
 import { CronJob } from "cron";
+import { PirhaParser } from "./PirhaParser";
+import "dotenv/config";
 
 async function parse() {
-  const parser = new TaysParser();
+  const parser = new PirhaParser();
   const therapists = await parser.parseAllTherapists();
-  if (process.env.API_URL) {
-    try {
-      axios.post(process.env.API_URL, therapists);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  console.log("done");
 }
 
 if (process.env.PARSE_ON_BOOT === "true") {
   try {
-    parse();
+    console.log("parsing on boot");
+    parse().then(() => {
+      if (!process.env.CRON) {
+        process.exit(0);
+      }
+    });
   } catch (error) {
     console.error(error);
   }
@@ -27,7 +26,11 @@ if (process.env.CRON) {
   const job = CronJob.from({
     cronTime: process.env.CRON,
     onTick: function () {
-      parse();
+      try {
+        parse();
+      } catch (error) {
+        console.error(error);
+      }
     },
     start: true,
     timeZone: "Europe/Helsinki",

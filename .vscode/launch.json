@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "https://www.pirha.fi/web/psykoterapeuttirekisteri/terapeutit/eloranta-sami",
+            "request": "launch",
+            "url": "https://www.pirha.fi/web/psykoterapeuttirekisteri/terapeutit/eloranta-sami"
+        }
+    ]
+}
