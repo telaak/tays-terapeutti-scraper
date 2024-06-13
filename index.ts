@@ -11,7 +11,11 @@ async function parse() {
 if (process.env.PARSE_ON_BOOT === "true") {
   try {
     console.log("parsing on boot");
-    parse().then(() => process.exit(0));
+    parse().then(() => {
+      if (!process.env.CRON) {
+        process.exit(0);
+      }
+    });
   } catch (error) {
     console.error(error);
   }
