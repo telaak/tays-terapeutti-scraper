@@ -1,6 +1,5 @@
 import axios from "axios";
 import jsdom from "jsdom";
-import { writeFile, mkdir } from "fs/promises";
 import { ContactInfo, Therapist, TherapyInfo } from "./newTypes";
 const { JSDOM } = jsdom;
 
@@ -291,6 +290,7 @@ export class PirhaParser {
       const therapistInfo = this.parseTherapist(therapistHtml);
       const fullTherapist = { ...therapist, ...therapistInfo };
       fullTherapists.push(fullTherapist);
+      console.log(`parsed: ${fullTherapist.fullName}`);
       const type = link.split("/").pop();
 
       if (process.env.API_URL) {
