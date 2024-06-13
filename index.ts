@@ -5,13 +5,13 @@ import "dotenv/config";
 async function parse() {
   const parser = new PirhaParser();
   const therapists = await parser.parseAllTherapists();
-  console.log('done')
+  console.log("done");
 }
 
 if (process.env.PARSE_ON_BOOT === "true") {
   try {
     console.log("parsing on boot");
-    parse();
+    parse().then(() => process.exit(0));
   } catch (error) {
     console.error(error);
   }

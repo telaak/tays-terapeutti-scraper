@@ -290,7 +290,7 @@ export class PirhaParser {
       const therapistInfo = this.parseTherapist(therapistHtml);
       const fullTherapist = { ...therapist, ...therapistInfo };
       fullTherapists.push(fullTherapist);
-      console.log(`parsed: ${fullTherapist.fullName}`);
+      console.log(`parsed: ${fullTherapist.lastName} ${therapist.firstName}`);
       const type = link.split("/").pop();
 
       if (process.env.API_URL) {
